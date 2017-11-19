@@ -1,5 +1,7 @@
 const apiBase = 'https://api.github.com'
 
+// Added progress for showing the progress of the request
+const ProgressBar = require('progress')
 // library for parsing command line options
 const commandLineArgs = require('command-line-args')
 const axios = require('axios')
@@ -30,3 +32,13 @@ const period = !options.period
 
 // Log request with the parameters specified
 console.log(`  Fetching ${period} for "${repo}"...`)
+
+// Progress Bar rendering
+const bar = new ProgressBar(':bar', { total: 10 })
+const timer = setInterval(function() {
+  bar.tick()
+  if (bar.complete) {
+    console.log('\ncomplete\n')
+    clearInterval(timer)
+  }
+}, 100)
