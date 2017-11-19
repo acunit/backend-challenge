@@ -42,3 +42,22 @@ const timer = setInterval(function() {
     clearInterval(timer)
   }
 }, 100)
+
+async function printComments() {
+  try {
+    // GET commit comments
+    // const commitCommentsPromise = await http.get(`/repos/${repo}/comments`)
+    // console.dir(commitComments)
+    // GET issues comments
+    const issuesCommentsPromise = await http.get(`/repos/${repo}/issues/comments`)
+    console.dir(issuesComments.data)
+    // GET pull request comments
+    // const pullRequestComments = await http.get(`/repos/${repo}/pulls/comments`)
+    // console.dir(pullRequestComments)
+  } catch (err) {
+    console.error(chalk.red(err))
+    console.dir(err.response.data, { colors: true, depth: 4 })
+  }
+}
+
+printComments()
