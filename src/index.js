@@ -93,6 +93,29 @@ async function printComments() {
       })
     const allUsers = Array.from(new Set(commitsUsers, issuesUsers, pullsUsers))
     console.log(allUsers)
+    // GET stats of the contributors
+    // GET /repos/:owner/:repo/stats/contributors
+    const stats = await http
+      .get(`/repos/${repo}/stats/contributors`)
+      .then(res => {
+        let users = new Array()
+        res.data.forEach(function(contributor) {
+          let user = {
+            name: contributor.author.login,
+            totalCommits: Number(contributor.total),
+          }
+          users.push(user)
+        })
+        // Sort users object by number of commits
+        users.sort(function(a, b) {
+          return parseFloat(b.totalCommits) - parseFloat(a.totalCommits)
+        })
+        // return user object to be saved as const stats
+        return users
+        // let users = {}
+        // console.log(res.data[0].total, res.data[0].author)
+      })
+    console.log(stats)
   } catch (err) {
     console.error(chalk.red(err))
     console.dir(err.response.data, { colors: true, depth: 4 })
