@@ -11,6 +11,7 @@ const http = axios.create({
   baseURL: apiBase,
   headers: {
     Authorization: `token ${config.GITHUB_PERSONAL_ACCESS_TOKEN}`,
+    // added pagination so the most recent items show
   },
 })
 
@@ -45,15 +46,53 @@ const timer = setInterval(function() {
 
 async function printComments() {
   try {
-    // GET commit comments
-    // const commitCommentsPromise = await http.get(`/repos/${repo}/comments`)
-    // console.dir(commitComments)
-    // GET issues comments
-    const issuesCommentsPromise = await http.get(`/repos/${repo}/issues/comments`)
-    console.dir(issuesComments.data)
-    // GET pull request comments
-    // const pullRequestComments = await http.get(`/repos/${repo}/pulls/comments`)
-    // console.dir(pullRequestComments)
+    // GET commit comments and store user names
+    const commitsUsers = await http
+      .get(`/repos/${repo}/comments?per_page=100`)
+      .then(res => {
+        // create an array to store the login
+        let users = new Array()
+        // loop over each comment and add login name to users Array
+        res.data.forEach(function(comment) {
+          users.push(comment.user.login)
+        })
+        // remove duplicate logins from the users array
+        users = Array.from(new Set(users))
+        // count number of comments user made on all of the repo
+        return users
+      })
+    // GET issues comments and store user names
+    const issuesUsers = await http
+      .get(`/repos/${repo}/issues/comments?per_page=100`)
+      .then(res => {
+        // create an array to store the login
+        let users = new Array()
+        // loop over each comment and add login name to users Array
+        res.data.forEach(function(comment) {
+          users.push(comment.user.login)
+        })
+        // remove duplicate logins from the users array
+        users = Array.from(new Set(users))
+        // count number of comments user made on all of the repo
+        return users
+      })
+    // GET pull request comments and store user names
+    const pullsUsers = await http
+      .get(`/repos/${repo}/pulls/comments?per_page=100`)
+      .then(res => {
+        // create an array to store the login
+        let users = new Array()
+        // loop over each comment and add login name to users Array
+        res.data.forEach(function(comment) {
+          users.push(comment.user.login)
+        })
+        // remove duplicate logins from the users array
+        users = Array.from(new Set(users))
+        // count number of comments user made on all of the repo
+        return users
+      })
+    const allUsers = Array.from(new Set(commitsUsers, issuesUsers, pullsUsers))
+    console.log(allUsers)
   } catch (err) {
     console.error(chalk.red(err))
     console.dir(err.response.data, { colors: true, depth: 4 })
