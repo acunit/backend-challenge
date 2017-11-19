@@ -4,6 +4,8 @@ const apiBase = 'https://api.github.com'
 const ProgressBar = require('progress')
 // library for parsing command line options
 const commandLineArgs = require('command-line-args')
+// Left pad for aligning text
+const leftPad = require('left-pad')
 const axios = require('axios')
 const chalk = require('chalk')
 const config = require('./config')
@@ -56,8 +58,6 @@ async function printComments() {
         res.data.forEach(function(comment) {
           users.push(comment.user.login)
         })
-        // remove duplicate logins from the users array
-        users = Array.from(new Set(users))
         // count number of comments user made on all of the repo
         return users
       })
@@ -71,8 +71,6 @@ async function printComments() {
         res.data.forEach(function(comment) {
           users.push(comment.user.login)
         })
-        // remove duplicate logins from the users array
-        users = Array.from(new Set(users))
         // count number of comments user made on all of the repo
         return users
       })
@@ -86,14 +84,13 @@ async function printComments() {
         res.data.forEach(function(comment) {
           users.push(comment.user.login)
         })
-        // remove duplicate logins from the users array
-        users = Array.from(new Set(users))
         // count number of comments user made on all of the repo
         return users
       })
-    const allUsers = Array.from(new Set(commitsUsers, issuesUsers, pullsUsers))
-    console.log(allUsers)
-    // GET stats of the contributors
+    // comments is an array with all of the instances a name shows up from comments
+    const comments = commitsUsers + issuesUsers + pullsUsers
+    console.log(comments)
+    // GET stats of the contributors and store as object
     // GET /repos/:owner/:repo/stats/contributors
     const stats = await http
       .get(`/repos/${repo}/stats/contributors`)
@@ -103,6 +100,7 @@ async function printComments() {
           let user = {
             name: contributor.author.login,
             totalCommits: Number(contributor.total),
+            totalComments: null,
           }
           users.push(user)
         })
@@ -115,7 +113,15 @@ async function printComments() {
         // let users = {}
         // console.log(res.data[0].total, res.data[0].author)
       })
-    console.log(stats)
+    // console.log(stats)
+    for (let user of stats) {
+      for (let comment of comments) {
+        
+      }
+      console.log(
+        `${leftPad(user.totalCommits, 4)} comments, ${user.name} ( commits)`,
+      )
+    }
   } catch (err) {
     console.error(chalk.red(err))
     console.dir(err.response.data, { colors: true, depth: 4 })
