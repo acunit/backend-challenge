@@ -48,15 +48,17 @@ const period = !options.period
 console.log(`  Fetching ${period} for "${repo}"...`)
 
 // Progress Bar rendering
-const bar = new ProgressBar(':bar', { total: 10 })
+// TODO: Incorporate this into the get requests to show progress
+const bar = new ProgressBar('  Downloading... [:bar]', { total: 20 })
 const timer = setInterval(function() {
   bar.tick()
   if (bar.complete) {
     console.log('\ncomplete\n')
     clearInterval(timer)
   }
-}, 100)
+}, 200)
 
+// TODO: Update the get request to query by period
 async function printCommentData() {
   try {
     // GET commit comments and store user names
